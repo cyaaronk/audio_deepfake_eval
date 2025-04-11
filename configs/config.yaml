@@ -1,0 +1,42 @@
+model_name: "SCL-Deepfake-audio-detection" #"tcm_add" #"conformer-based-classifier-for-anti-spoofing"
+eer_files_dir: "eer_files_full"
+
+# List of datasets to evaluate with their specific configurations
+datasets:
+  - name: "academicodec_hifi_16k_320d"
+    include_patterns:
+      - "p227"
+      - "p228"
+  - name: "audiodec_24k_320d"
+    include_patterns:
+      - "p227"
+      - "p228"
+  - name: "descript-audio-codec-16khz"
+    include_patterns:
+      - "p227"
+      - "p228"
+  - name: "encodec_24khz"
+    include_patterns:
+      - "p227"
+      - "p228"
+  - name: "funcodec-funcodec_en_libritts-16k-nq32ds320"
+    include_patterns:
+      - "p227"
+      - "p228"
+  - name: "asvspoof2021_df"
+  - name: "ami_ihm"
+  - name: "ami_sdm"
+  - name: "asvspoof2019_la"
+  - name: "av_deepfake_1m"
+  - name: "emofake"
+  - name: "fakeavceleb"
+  - name: "librispeech_test_clean"
+  - name: "librispeech_test_other"
+  - name: "llamapartialspoof_r01tts0a"
+  - name: "llamapartialspoof_r01tts0b"
+  - name: "mlaad"
+  #- name: "partialspoof"
+  - name: "release_in_the_wild"
+  - name: "scenefake"
+  - name: "speech_tokenizer"
+  - name: "vctk"

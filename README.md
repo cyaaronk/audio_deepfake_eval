@@ -27,6 +27,10 @@ A comprehensive evaluation framework for audio deepfake detection (ADD) from [NT
 - [Roadmap](#-roadmap)
 - [News](#-news)
 
+<p align="center">
+  • • •
+</p>
+
 ## 📝 Introduction
 
 Standard ADD evaluations often rely on datasets that unevenly represent different synthesizers and lack diversity in bona fide speech, leading to biased and less reliable Equal Error Rate (EER) measurements.
@@ -36,8 +40,12 @@ Our framework introduces bona fide cross-testing, incorporating multiple bona fi
 We benchmark over 150 synthesizers across nine bona fide speech types and release a new dataset to facilitate further research. 🚀
 
 <p align="center">
-  <img src="docs/en/_static/images/eval_framework.png" width="100%">
+  <img src="docs/en/_static/images/eval_framework.png" width="80%">
   <br>Audio Deepfake Detection Eval Framework
+</p>
+
+<p align="center">
+  • • •
 </p>
 
 ## ✨ Key Features
@@ -47,6 +55,10 @@ We benchmark over 150 synthesizers across nine bona fide speech types and releas
 3. **EER Aggregation**: Summarize results using maximum pooling to identify challenging synthesizers
 4. **Comprehensive Visualization**: Generate detailed plots and statistics for analysis
 5. **Flexible Dataset Support**: Evaluate on standard and custom datasets
+
+<p align="center">
+  • • •
+</p>
 
 ## 🛠️ Installation
 
@@ -86,44 +98,18 @@ pip install -r add_detect_eval/requirements.txt
 - PyYAML
 - scikit-learn
 
+<p align="center">
+  • • •
+</p>
+
 ## 🚀 Quick Start
-
-### 1. Prepare Configuration
-
-Create `config.yaml`:
-```yaml
-model_name: "conformer-based-classifier-for-anti-spoofing"
-eer_files_dir: "./eer_files"
-
-datasets:
-  - name: "asvspoof_2021_DF"
-    include_patterns:
-      - ".wav"
-      - "p227"
-      - "p228"
-  - name: "academicodec_hifi_16k_320d"
-    include_patterns:
-```
-
-The `include_patterns` field is optional for each dataset. When specified:
-- Only audio samples whose IDs match any of the patterns will be included in the evaluation
-- Patterns can be file extensions (e.g., ".wav"), speaker IDs (e.g., "p227"), or any other ID pattern
-- If not specified, all samples in the dataset will be evaluated
-- Multiple patterns can be specified to include different subsets of samples
-
-For example, to evaluate only samples from speakers p227 and p228:
-```yaml
-datasets:
-  - name: "vctk"
-    include_patterns:
-      - "p227"  # Include samples from speaker p227
-      - "p228"  # Include samples from speaker p228
-```
 
 ### 2. Run Evaluation
 
+Compute Equal Error Rate (EER) for one of the dataset listed in the config:
+
 ```bash
-python add_detect_eval/compute_eers.py --config config.yaml --dataset asvspoof_2021_DF
+python add_detect_eval/compute_eers.py --config configs/config.yaml --dataset asvspoof2021_df
 ```
 
 If you don't specify a dataset, the script will show available datasets:
@@ -131,16 +117,16 @@ If you don't specify a dataset, the script will show available datasets:
 ERROR: Please specify a dataset to evaluate using --dataset
 
 Available datasets in config:
-   asvspoof_2021_DF
+   asvspoof2021_df
    academicodec_hifi_16k_320d
 
 Example usage:
-   python add_detect_eval/compute_eers.py --config config.yaml --dataset <dataset_name>
+   python add_detect_eval/compute_eers.py --config configs/config.yaml --dataset <dataset_name>
 ```
 
 Example output:
 ```
-Processing dataset: [asvspoof_2021_DF]
+Processing dataset: [asvspoof2021_df]
    Including patterns: *.wav
 
 Computing EER...
@@ -161,30 +147,22 @@ Synthesizer statistics:
 
 ```bash
 python add_detect_eval/visualize_stats.py \
-  --config config.yaml \
-  --dataset asvspoof_2021_DF \
+  --config configs/config.yaml \
+  --dataset asvspoof2021_df \
   --output-dir ./visualizations
-```
-
-If you don't specify a dataset, the script will show available datasets:
-```
-ERROR: Please specify a dataset to visualize using --dataset
-
-Available datasets in config:
-   asvspoof_2021_DF
-   academicodec_hifi_16k_320d
-
-Example usage:
-   python add_detect_eval/visualize_stats.py --config config.yaml --dataset <dataset_name>
 ```
 
 Example output:
 ```
-Processing dataset: [asvspoof_2021_DF]
+Processing dataset: [asvspoof2021_df]
    Including patterns: *.wav
 
-Visualization saved to ./visualizations/asvspoof_2021_DF_statistics.png
+Visualization saved to ./visualizations/asvspoof2021_df_statistics.png
 ```
+
+<p align="center">
+  • • •
+</p>
 
 ## 🔍 Advanced Usage
 
@@ -194,7 +172,7 @@ Evaluate models across different combinations of bonafide and spoof datasets:
 
 ```bash
 python add_detect_eval/compute_eers_cross_testing.py \
-  --config config.yaml \
+  --config configs/config.yaml \
   --output-dir ./output \
   --plot-dir ./visualizations
 ```
@@ -214,12 +192,12 @@ visualizations/
 #### Example Log Output
 
 ```
-Processing dataset: [asvspoof_2021_DF]
+Processing dataset: [asvspoof2021_df]
    Including patterns: *.wav
 
 Dataset Summary:
    Bonafide subsets: [librispeech_clean], [vctk]
-   Spoof subsets: [asvspoof_2021_DF], [av_deepfake_1m]
+   Spoof subsets: [asvspoof2021_df], [av_deepfake_1m]
 
 Computing EER:
    Bonafide subset:  [vctk]
@@ -252,31 +230,188 @@ glow-tts,0.0434,0.0567,0.0412
     "asvspoof_2021_fastspeech2": {
       "eer": 0.0347,
       "threshold": -3.621,
-      "spoof_subset": "asvspoof_2021_DF",
+      "spoof_subset": "asvspoof2021_df",
       "synthesizer": "fastspeech2"
     }
   }
 }
 ```
 
-3. **Cross-Testing Matrix Visualization**:
+## 📊 Cross-Testing Matrix Visualizations
+
+The framework generates two types of cross-testing matrix visualizations to help you analyze model performance:
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="50%">
+        <b>🔍 Individual Model Matrix</b><br>
+        <em>Performance analysis for a single model</em>
+      </td>
+      <td align="center" width="50%">
+        <b>🔄 Merged Cross-Testing Matrix</b><br>
+        <em>Comparative analysis across multiple models</em>
+      </td>
+    </tr>
+  </table>
+</div>
+
+### 1. Individual Model Matrix
 
 <p align="center">
-  <img src="docs/en/_static/images/cross_testing_matrix.png" width="50%">
+  <img src="docs/en/_static/images/cross_testing_matrix.png" width="30%">
   <br>
   <em>Cross-Testing EER Matrix Heatmap</em>
 </p>
 
-The heatmap shows EER values (%) for each combination of:
-- X-axis: Bonafide speech datasets
-- Y-axis: Synthesizer IDs
-- Color intensity: EER value (darker = higher EER)
+Each model's cross-testing matrix shows the Equal Error Rate (EER) for different combinations of bona fide and spoof datasets. The matrix is organized as follows:
 
-For detailed documentation, see our [📖 User Guide](https://evalscope.readthedocs.io/en/latest/advanced_guides/custom_dataset/index.html).
+| Element | Description |
+|---------|-------------|
+| **X-axis** | Bona fide datasets (source of genuine audio samples) |
+| **Y-axis** | Synthesizer IDs (numbered 1 to N, where N is the number of spoof datasets) |
+| **Color intensity** | EER value (darker blue indicates higher EER, meaning worse performance) |
+
+This visualization helps you understand how well your model performs when tested on different combinations of genuine and synthetic audio.
+
+### 2. Merged Cross-Testing Matrix
+
+<p align="center">
+  <img src="docs/en/_static/images/merged_cross_testing_matrix.png" width="80%">
+  <br>
+  <em>Merged Cross-Testing EER Matrix Heatmap</em>
+</p>
+
+The merged cross-testing matrix combines results from all models in a single visualization, allowing for direct comparison of performance across different models:
+
+| Element | Description |
+|---------|-------------|
+| **Layout** | Grid of heatmaps, with one heatmap per model |
+| **X-axis** | Bona fide datasets (consistent across all models) |
+| **Y-axis** | Synthesizer IDs (numbered 1 to N) |
+| **Color intensity** | EER value (darker blue indicates higher EER) |
+| **Color range** | Fixed from 0% to 35% for all models |
+| **Title** | Model name and mean EER percentage |
+
+This merged visualization is automatically generated after running `compute_eers_cross_testing.py`. It provides a comprehensive view of how different models compare in terms of their ability to detect audio deepfakes across various dataset combinations.
+
+The merged matrix is saved as `merged_cross_testing_matrix.png` in the visualizations directory and is updated each time you run the evaluation script.
+
+<p align="center">
+  • • •
+</p>
+
+## 🔧 Use your own model and dataset for evaluation
+
+After you run your own model on custom datasets and obtain the classification scores, you can evaluate them by:
+1. Preparing the score files following the structure in `eer_files/`
+2. Preparing the configuration files
+
+### 1. 📁 Prepare Score Files
+
+The `eer_files/` directory contains the classification scores for each model. The structure is as follows:
+
+```
+eer_files/
+├── model_name_1/
+│   ├── scores/
+│   │   ├── dataset1.txt
+│   │   ├── dataset2.txt
+│   │   └── ...
+│   └── keys/
+│       ├── dataset1.txt
+│       ├── dataset2.txt
+│       └── ...
+├── model_name_2/
+│   ├── scores/
+│   │   └── ...
+│   └── keys/
+│       └── ...
+└── ...
+```
+
+Each model directory contains:
+- `scores/`: Contains text files with classification scores for each dataset
+- `keys/`: Contains text files with ground truth labels for each dataset
+
+#### 📝 The score file follows this format:
+```
+audio_id_1 score_value_1
+audio_id_2 score_value_2
+...
+```
+
+Where:
+- `audio_id`: The identifier of the audio file (without extension)
+- `score_value`: This is the classification score (higher values indicate higher confidence of being a spoof)
+
+Example score file (`eer_files/model_name/scores/asvspoof2021_df.txt`):
+```
+ASV21_DF_T_0000001 0.123
+ASV21_DF_T_0000002 0.456
+ASV21_DF_T_0000003 0.789
+...
+```
+
+#### 📝 The key file format is:
+```
+- <audio_id> <codec> - <synthesizer_type> <label> - eval - - - - -
+```
+
+Where:
+- `audio_id`: The identifier of the audio file
+- `codec`: The audio codec used (e.g., "mp3", "aac", "nocodec", or "-" if not applicable)
+- `synthesizer_type`: The synthesizer used (e.g., "fastspeech2", or "-" if not applicable)
+- `label`: The ground truth label ("bonafide" or "spoof")
+- The remaining hyphens are dummy columns for compatibility
+
+Example key file (`eer_files/model_name/keys/asvspoof2021_df.txt`):
+```
+LA_0039 LA_E_2834763 nocodec asvspoof A11 spoof notrim eval Unknown - - - -
+LA_0040 LA_E_2834764 mp3 - A12 bonafide notrim eval Unknown - - - -
+LA_0041 LA_E_2834765 - - A13 bonafide notrim eval Unknown - - - -
+...
+```
+
+### 2. ⚙️ Prepare Configuration
+
+Create `config.yaml` inside the folder `configs/`:
+```yaml
+model_name: "conformer-based-classifier-for-anti-spoofing"
+eer_files_dir: "./eer_files"
+
+datasets:
+  - name: "asvspoof2021_df"
+    include_patterns:
+      - ".wav"
+      - "p227"
+      - "p228"
+  - name: "academicodec_hifi_16k_320d"
+    include_patterns:
+```
+
+The `include_patterns` field is optional for each dataset. When specified:
+- Only audio samples whose IDs match any of the patterns will be included in the evaluation
+- Patterns can be file extensions (e.g., ".wav"), speaker IDs (e.g., "p227"), or any other ID pattern
+- If not specified, all samples in the dataset will be evaluated
+- Multiple patterns can be specified to include different subsets of samples
+
+For example, to evaluate only samples from speakers p227 and p228:
+```yaml
+datasets:
+  - name: "vctk"
+    include_patterns:
+      - "p227"  # Include samples from speaker p227
+      - "p228"  # Include samples from speaker p228
+```
+
+<p align="center">
+  • • •
+</p>
 
 ## 📊 Supported Datasets
 
-### Audio Codecs
+### 🎵 Audio Codecs
 ✅ CodecFake  
 ✅ academicodec_hifi_16k_320d  
 ✅ audiodec_24k_320d  
@@ -284,15 +419,15 @@ For detailed documentation, see our [📖 User Guide](https://evalscope.readthed
 ✅ encodec_24khz  
 ✅ funcodec-funcodec_en_libritts-16k-nq32ds320  
 
-### Speech Datasets  
+### 🗣️ Speech Datasets  
 ✅ librispeech_test_clean  
 ✅ librispeech_test_other  
 ✅ ami_ihm  
 ✅ ami_sdm  
 ✅ vctk  
 
-### Deepfake Detection Datasets
-✅ asvspoof_2021_DF  
+### 🎭 Deepfake Detection Datasets
+✅ asvspoof2021_df  
 ✅ asvspoof2019_la  
 ✅ av_deepfake_1m  
 ✅ emofake  
@@ -303,32 +438,72 @@ For detailed documentation, see our [📖 User Guide](https://evalscope.readthed
 ✅ partialspoof  
 ✅ release_in_the_wild  
 ✅ scenefake  
-✅ speech_tokenizer  
+✅ speech_tokenizer 
+
+<p align="center">
+  • • •
+</p>
+
+## 📥 Dataset Access
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="50%">
+        <b>🚀 Quick Download</b><br>
+        <em>Pre-processed datasets in a single package</em>
+      </td>
+      <td align="center" width="50%">
+        <b>🔍 Manual Download</b><br>
+        <em>Individual dataset access with detailed instructions</em>
+      </td>
+    </tr>
+  </table>
+</div>
+
+| Option | Description | Size | Link |
+|--------|-------------|------|------|
+| 📦 **All-in-One Package** | Pre-processed datasets with 600 samples per type | ~2GB | [Hugging Face](https://huggingface.co/datasets/ntu-dtc/audio_deepfake_eval) |
+| 📚 **Detailed Guide** | Step-by-step instructions for each dataset | Varies | [Dataset Guide](datasets/README.md) |
+
+> 💡 **Pro Tip:** The all-in-one package is recommended for quick evaluation. For full datasets or specific subsets, follow the manual download guide in [datasets/README.md](datasets/README.md).
+
+<p align="center">
+  • • •
+</p>
 
 ## 📈 Leaderboard
 
 <p align="center">
-  <img src="docs/en/_static/images/leaderboard.jpeg" width="100%">
+  <img src="docs/en/_static/images/leaderboard.jpeg" width="80%">
   <br>
   <em>Model Performance Comparison on Different Datasets</em>
 </p>
 
 The leaderboard shows Equal Error Rate (EER) performance of different models across various datasets. Lower EER indicates better performance in distinguishing between genuine and spoofed audio.
 
+<p align="center">
+  • • •
+</p>
+
 ## 🔜 Roadmap
 
-### Completed
+### ✅ Completed
 ✅ Single dataset EER evaluation  
 ✅ Compute audio statistics for datasets  
 ✅ Audio statistics visualization  
 ✅ Cross testing EER evaluation  
 ✅ Cross testing EER visualization  
 
-### In Progress
+### 🚧 In Progress
 ⬜ Latex table results generation  
 ⬜ Support for new audio codecs  
 ⬜ Integration with more deepfake detection models  
 ⬜ Real-time evaluation pipeline  
+
+<p align="center">
+  • • •
+</p>
 
 ## 🎉 News
 

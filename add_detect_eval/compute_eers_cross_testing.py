@@ -231,10 +231,12 @@ def plot_cross_testing_matrix(eers: List[List[float]], bonafide_subsets: List[st
     # Create figure with dynamic size and high DPI
     plt.figure(dpi=1200)
     
-    # Plot heatmap with new orientation
+    # Plot heatmap with new orientation and fixed color range from 0-35%
     ax = sns.heatmap(
         data,
-        robust=True,
+        robust=False,  # Disable robust scaling to use fixed range
+        vmin=0,        # Set minimum value to 0
+        vmax=0.35,     # Set maximum value to 35%
         cmap='Blues',
         xticklabels=bonafide_subsets,
         square=False,  # Allow rectangular shape
@@ -271,6 +273,137 @@ def plot_cross_testing_matrix(eers: List[List[float]], bonafide_subsets: List[st
     plt.savefig(os.path.join(model_plot_dir, 'cross_testing_matrix.png'), 
                 bbox_inches='tight', pad_inches=0.5)
     plt.close()
+    
+    # Return the data for potential merging with other models
+    return data, bonafide_subsets, spoof_subsets
+
+def create_merged_matrix_plot(plot_dir: str, output_dir: str):
+    """Create a merged matrix plot from all models in the visualizations directory."""
+    # Check if the plot directory exists
+    if not os.path.exists(plot_dir):
+        print(f"Plot directory {plot_dir} does not exist. Skipping merged plot creation.")
+        return
+    
+    # Check if the output directory exists
+    if not os.path.exists(output_dir):
+        print(f"Output directory {output_dir} does not exist. Skipping merged plot creation.")
+        return
+    
+    # Get all model directories from the output directory
+    model_dirs = [d for d in os.listdir(output_dir) if os.path.isdir(os.path.join(output_dir, d))]
+    
+    if not model_dirs:
+        print(f"No model directories found in {output_dir}. Skipping merged plot creation.")
+        return
+    
+    # Dictionary to store data from each model
+    all_model_data = {}
+    
+    # Load data from each model
+    for model_name in model_dirs:
+        model_output_dir = os.path.join(output_dir, model_name)
+        results_path = os.path.join(model_output_dir, 'results.json')
+        
+        if not os.path.exists(results_path):
+            print(f"Results file not found for model {model_name} in {results_path}. Skipping.")
+            continue
+        
+        try:
+            with open(results_path, 'r') as f:
+                results = json.load(f)
+            
+            # Extract data
+            eers = np.array(results['eer_matrix'])
+            bonafide_subsets = results['bonafide_subsets']
+            spoof_subsets = results['spoof_subsets']
+            
+            # Store data
+            all_model_data[model_name] = {
+                'data': eers.T,  # Transpose to match the plot orientation
+                'bonafide_subsets': bonafide_subsets,
+                'spoof_subsets': spoof_subsets,
+                'mean_eer': results.get('mean_eer', 0)
+            }
+            
+        except Exception as e:
+            print(f"Error loading data for model {model_name}: {e}")
+    
+    if not all_model_data:
+        print("No valid model data found. Skipping merged plot creation.")
+        return
+    
+    # Create merged plot
+    print("\nCreating merged matrix plot from all models...")
+    
+    # Set up the figure
+    plt.figure(figsize=(15, 10), dpi=1200)
+    
+    # Calculate grid dimensions
+    n_models = len(all_model_data)
+    grid_cols = min(3, n_models)  # Max 3 columns
+    grid_rows = (n_models + grid_cols - 1) // grid_cols  # Ceiling division
+    
+    # Create subplots
+    fig, axes = plt.subplots(grid_rows, grid_cols, figsize=(15, 5 * grid_rows), dpi=1200)
+    
+    # Flatten axes for easier indexing
+    if grid_rows == 1 and grid_cols == 1:
+        axes = np.array([axes])
+    axes = axes.flatten()
+    
+    # Plot each model's data
+    for idx, (model_name, model_data) in enumerate(all_model_data.items()):
+        if idx >= len(axes):
+            break
+            
+        ax = axes[idx]
+        data = model_data['data']
+        bonafide_subsets = model_data['bonafide_subsets']
+        spoof_subsets = model_data['spoof_subsets']
+        mean_eer = model_data['mean_eer']
+        
+        # Create numeric y-axis labels (synthesizer IDs)
+        y_labels = list(range(1, len(spoof_subsets) + 1))
+        
+        # Plot heatmap
+        sns.heatmap(
+            data,
+            robust=False,
+            vmin=0,
+            vmax=0.35,
+            cmap='Blues',
+            xticklabels=bonafide_subsets,
+            ax=ax,
+            cbar_kws={'format': FuncFormatter(lambda x, _: "%.0f%%" % (x * 100))}
+        )
+        
+        # Customize plot appearance
+        ax.set_title(f"{model_name}\nMean EER: {mean_eer:.2%}", fontsize=12)
+        ax.set_xlabel('Bona fide Subset')
+        ax.set_ylabel('Synthesizer ID')
+        
+        # Rotate x-axis labels for better readability
+        plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
+        
+        # Remove tick marks
+        ax.tick_params(top=False, bottom=False, left=False, right=False)
+        
+        # Set y-axis rotation to 0 for better readability
+        plt.yticks(rotation=0)
+    
+    # Hide empty subplots
+    for idx in range(len(all_model_data), len(axes)):
+        axes[idx].set_visible(False)
+    
+    # Adjust layout
+    plt.tight_layout()
+    
+    # Save merged plot
+    merged_plot_path = os.path.join(plot_dir, 'merged_cross_testing_matrix.png')
+    plt.savefig(merged_plot_path, bbox_inches='tight', pad_inches=0.5)
+    plt.close()
+    
+    print(f"Merged matrix plot saved to: {merged_plot_path}")
 
 def load_existing_results(model_output_dir: str) -> Tuple[List[List[float]], List[str], List[str], Dict]:
     """Load existing results from output directory."""
@@ -324,6 +457,9 @@ def main():
         # Plot using existing results
         plot_cross_testing_matrix(eers, bonafide_subsets, spoof_subsets, args.plot_dir, 
                                 config['model_name'], None)
+        
+        # Create merged plot with all models
+        create_merged_matrix_plot(args.plot_dir, args.output_dir)
         
         print(f"\nVisualization updated successfully:")
         print(f"   Using existing results from: {model_output_dir}")
@@ -428,6 +564,9 @@ def main():
     plot_cross_testing_matrix(eers, bonafide_subsets, spoof_subsets, args.plot_dir, 
                             config['model_name'], id2count[config['model_name']])
     
+    # Create merged plot with all models
+    create_merged_matrix_plot(args.plot_dir, args.output_dir)
+    
     # Save detailed EER results
     eer_details_path = os.path.join(model_output_dir, 'eer_details.json')
     with open(eer_details_path, 'w') as f:
@@ -436,6 +575,7 @@ def main():
     print(f"\nResults saved successfully:")
     print(f"   EER results and statistics: {os.path.join(args.output_dir, config['model_name'])}")
     print(f"   Visualization plots: {os.path.join(args.plot_dir, config['model_name'])}")
+    print(f"   Merged visualization: {os.path.join(args.plot_dir, 'merged_cross_testing_matrix.png')}")
 
 if __name__ == "__main__":
     main() 
