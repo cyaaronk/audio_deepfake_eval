@@ -153,6 +153,6 @@ _build/
 swift.test*
 /cache
 evalscope/backend/rag_eval/ragas/prompts/chinese
-/datasets
+/my_datasets
 /output
 /visualizations
