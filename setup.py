@@ -138,8 +138,8 @@ if __name__ == '__main__':
     extra_requires['all'] = all_requires
 
     setup(
-        name='add_detect_eval',
-        version=get_version(),
+        name='audio_deepfake_eval',
+        version='0.1.0',
         author='Digital Trust Centre team',
         author_email='kwok0062@e.ntu.edu.sg',
         keywords='python,audio deepfake detection,evaluation',

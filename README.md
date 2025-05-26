@@ -7,10 +7,6 @@
 </p>
 
 <p align="center">
-  <a href="README_zh.md">中文</a> &nbsp ｜ &nbsp English &nbsp
-</p>
-
-<p align="center">
 <img src="https://img.shields.io/badge/python-%E2%89%A53.8-5be.svg">
 <a href="https://github.com/ntu-dtc/audio_deepfake_eval/pulls"><img src="https://img.shields.io/badge/PR-welcome-55EB99.svg"></a>
 </p>
@@ -76,9 +72,14 @@ We benchmark over 150 synthesizers across nine bona fide speech types and releas
    source add_eval_env/bin/activate
    ```
 
-2. Install dependencies
+2. Install the package in development mode
    ```bash
-   pip install -r add_detect_eval/requirements.txt
+   # Clone the repository
+   git clone https://github.com/ntu-dtc/audio_deepfake_eval.git
+   cd audio_deepfake_eval
+   
+   # Install in development mode
+   pip install -e .
    ```
 
 ### Method 2: Manual Installation
@@ -86,7 +87,24 @@ We benchmark over 150 synthesizers across nine bona fide speech types and releas
 ```bash
 git clone https://github.com/ntu-dtc/audio_deepfake_eval.git
 cd audio_deepfake_eval
-pip install -r add_detect_eval/requirements.txt
+pip install -r requirements.txt
+```
+
+### Project Structure
+```
+audio_deepfake_eval/
+├── audio_deepfake_eval/          # Main package directory
+│   ├── __init__.py              # Package initialization
+│   ├── add_detect_eval/         # Core evaluation modules
+│   │   ├── compute_eers.py
+│   │   └── compute_eers_cross_testing.py
+│   └── utils/                   # Utility modules
+│       ├── __init__.py
+│       └── latex_table.py
+├── configs/                     # Configuration files
+├── docs/                        # Documentation
+├── requirements.txt             # Dependencies
+└── setup.py                     # Package setup
 ```
 
 ### Dependencies
@@ -104,12 +122,12 @@ pip install -r add_detect_eval/requirements.txt
 
 ## 🚀 Quick Start
 
-### 2. Run Evaluation
+### 1. Run Evaluation
 
 Compute Equal Error Rate (EER) for one of the dataset listed in the config:
 
 ```bash
-python add_detect_eval/compute_eers.py --config configs/config.yaml --dataset asvspoof2021_df
+python audio_deepfake_eval/compute_eers.py --config configs/config.yaml --dataset asvspoof2021_df
 ```
 
 If you don't specify a dataset, the script will show available datasets:
@@ -121,7 +139,7 @@ Available datasets in config:
    academicodec_hifi_16k_320d
 
 Example usage:
-   python add_detect_eval/compute_eers.py --config configs/config.yaml --dataset <dataset_name>
+   python audio_deepfake_eval/compute_eers.py --config configs/config.yaml --dataset <dataset_name>
 ```
 
 Example output:
@@ -143,10 +161,10 @@ Synthesizer statistics:
    glow-tts: 300 files
 ```
 
-### 3. Visualize Results
+### 2. Visualize Results
 
 ```bash
-python add_detect_eval/visualize_stats.py \
+python audio_deepfake_eval/visualize_stats.py \
   --config configs/config.yaml \
   --dataset asvspoof2021_df \
   --output-dir ./visualizations
@@ -171,14 +189,19 @@ Visualization saved to ./visualizations/asvspoof2021_df_statistics.png
 Evaluate models across different combinations of bonafide and spoof datasets:
 
 ```bash
-python add_detect_eval/compute_eers_cross_testing.py \
+python audio_deepfake_eval/compute_eers_cross_testing.py \
   --config configs/config.yaml \
   --output-dir ./output \
   --plot-dir ./visualizations
 ```
 
-#### Example Output Structure
+This script performs two main tasks:
 
+#### 1. Cross-Testing Matrix
+
+Generates a heatmap visualization showing EERs for each combination of bonafide and spoof datasets.
+
+**Output Structure:**
 ```
 output/
 ├── eer_matrix.csv         # Cross-testing EER results in CSV format
@@ -186,11 +209,12 @@ output/
 └── results.json          # Summary statistics and metadata
 
 visualizations/
-└── cross_testing_matrix.png  # Heatmap visualization of EER matrix
+├── merged_cross_testing_matrix.png  # Heatmap visualization of EER matrixes for all models tested so far
+└── <model_dir>/                    # Directory for each model's visualizations
+    └── cross_testing_matrix.png    # Individual model's cross-testing matrix
 ```
 
-#### Example Log Output
-
+**Log Output:**
 ```
 Processing dataset: [asvspoof2021_df]
    Including patterns: *.wav
@@ -213,47 +237,44 @@ Results saved successfully:
    Visualization plots: ./visualizations
 ```
 
-#### Example Results
+#### 2. LaTeX Table Generation
 
-1. **EER Matrix (eer_matrix.csv)**:
-```csv
-Dataset,librispeech_clean,librispeech_other,vctk
-fastspeech2,0.0347,0.0412,0.0389
-tacotron2,0.0523,0.0678,0.0456
-glow-tts,0.0434,0.0567,0.0412
-```
+Creates a comprehensive LaTeX table that includes:
 
-2. **Detailed Results (eer_details.json)**:
-```json
-{
-  "librispeech_clean": {
-    "asvspoof_2021_fastspeech2": {
-      "eer": 0.0347,
-      "threshold": -3.621,
-      "spoof_subset": "asvspoof2021_df",
-      "synthesizer": "fastspeech2"
-    }
-  }
-}
-```
+| Feature | Description |
+|---------|-------------|
+| **Maximum EERs** | Highest EER across all synthesizer types for each model and bonafide subset |
+| **Average EERs** | Mean EER across all synthesizer types for each model and bonafide subset |
+| **Color Coding** | Blue gradient indicating EER values (darker = higher EER) |
+| **Formatting** | Values formatted to 2 decimal places |
+| **Structure** | Horizontal rule separating max and average sections |
+| **Labels** | Model names and bonafide subset names truncated to 10 characters |
+
+<p align="center">
+  <img src="docs/en/_static/images/latex_table_example.png" width="80%">
+  <br>
+  <em>Example LaTeX Table Format</em>
+</p>
+
+The LaTeX table is automatically generated and printed to the console, ready to be copied into your LaTeX document. The table structure is optimized for readability and includes proper LaTeX formatting for color coding and alignment.
 
 ## 📊 Cross-Testing Matrix Visualizations
 
 The framework generates two types of cross-testing matrix visualizations to help you analyze model performance:
 
 <div align="center">
-  <table>
-    <tr>
+<table>
+  <tr>
       <td align="center" width="50%">
         <b>🔍 Individual Model Matrix</b><br>
         <em>Performance analysis for a single model</em>
-      </td>
+    </td>
       <td align="center" width="50%">
         <b>🔄 Merged Cross-Testing Matrix</b><br>
         <em>Comparative analysis across multiple models</em>
-      </td>
-    </tr>
-  </table>
+    </td>
+  </tr>
+</table>
 </div>
 
 ### 1. Individual Model Matrix
@@ -463,7 +484,7 @@ datasets:
 
 | Option | Description | Size | Link |
 |--------|-------------|------|------|
-| 📦 **All-in-One Package** | Pre-processed datasets with 600 samples per type | ~2GB | [Hugging Face](https://huggingface.co/datasets/ntu-dtc/audio_deepfake_eval) |
+| 📦 **All-in-One Package** | Pre-processed datasets with 600 samples per type | ~2GB | [Zenodo](https://zenodo.org/) |
 | 📚 **Detailed Guide** | Step-by-step instructions for each dataset | Varies | [Dataset Guide](datasets/README.md) |
 
 > 💡 **Pro Tip:** The all-in-one package is recommended for quick evaluation. For full datasets or specific subsets, follow the manual download guide in [datasets/README.md](datasets/README.md).
@@ -507,7 +528,7 @@ The leaderboard shows Equal Error Rate (EER) performance of different models acr
 
 ## 🎉 News
 
-- 🔥 **[2025.02.28]** Official release with benchmark results for 164 synthesizers and 9 bona fide speech styles
-- 🔥 **[2024.09.18]** Documentation released with technical research and discussions. [📖 Read more](https://evalscope.readthedocs.io/en/refact_readme/blog/index.html)
+- 🔥 **[2025.05.26]** Official release with benchmark results for 164 synthesizers and 9 bona fide speech styles
+- 🔥 **[2024.09.18]** Documentation released with technical research and discussions.
 
 > ⭐ If you like this project, please star it! Your support motivates us to keep improving.

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import matplotlib
 matplotlib.use('Agg')  # Use non-GUI backend
@@ -15,6 +16,7 @@ import yaml
 import os
 import pandas as pd
 import json
+from audio_deepfake_eval.utils.latex_table import print_table
 
 def load_config(config_path: str) -> Dict[str, Any]:
     """Load configuration from YAML file."""
@@ -424,6 +426,146 @@ def load_existing_results(model_output_dir: str) -> Tuple[List[List[float]], Lis
     
     return eers, bonafide_subsets, spoof_subsets, eer_details
 
+def compute_model_statistics(output_dir: str):
+    """Compute and display max and average EERs across synthesizer types for each model."""
+    if not os.path.exists(output_dir):
+        print(f"Output directory {output_dir} does not exist. Skipping statistics computation.")
+        return
+    
+    # Get all model directories
+    model_dirs = [d for d in os.listdir(output_dir) if os.path.isdir(os.path.join(output_dir, d))]
+    
+    if not model_dirs:
+        print(f"No model directories found in {output_dir}. Skipping statistics computation.")
+        return
+    
+    # Dictionary to store results for each model
+    all_model_results = {}
+    
+    # Process each model
+    n_synthesizers = None
+    for model_name in model_dirs:
+        model_output_dir = os.path.join(output_dir, model_name)
+        results_path = os.path.join(model_output_dir, 'results.json')
+        
+        if not os.path.exists(results_path):
+            print(f"Results file not found for model {model_name} in {results_path}. Skipping.")
+            continue
+        
+        try:
+            with open(results_path, 'r') as f:
+                results = json.load(f)
+            
+            # Extract EER matrix and bonafide subsets
+            eers = np.array(results['eer_matrix'])
+            bonafide_subsets = results['bonafide_subsets']
+            if n_synthesizers is None:
+                n_synthesizers = eers.shape[1]
+            else:
+                assert n_synthesizers == eers.shape[1]
+            
+            # Compute max and average EERs across synthesizer types for each bonafide subset
+            max_eers = []
+            avg_eers = []
+            for i, bonafide_subset in enumerate(bonafide_subsets):
+                max_eer = np.max(eers[i])
+                avg_eer = np.mean(eers[i])
+                max_eers.append(max_eer)
+                avg_eers.append(avg_eer)
+            
+            # Add mean row
+            bonafide_subsets.append("Mean")
+            max_eers.append(np.mean(max_eers))
+            avg_eers.append(np.mean(avg_eers))
+            
+            # Store results for this model
+            all_model_results[model_name] = {
+                'bonafide_subsets': bonafide_subsets,
+                'max_eers': max_eers,
+                'avg_eers': avg_eers
+            }
+            
+            # Print text table for this model
+            print(f"\nModel: {model_name}")
+            print("Text Table:")
+            print("                                        Max EER (%)    Avg EER (%)")
+            for subset, max_eer, avg_eer in zip(bonafide_subsets, max_eers, avg_eers):
+                print(f"{subset:<40} {max_eer:>6.1f}        {avg_eer:>6.1f}")
+            
+        except Exception as e:
+            print(f"Error processing model {model_name}: {e}")
+    
+    if not all_model_results:
+        print("No valid model data found. Skipping statistics computation.")
+        return
+    
+    # Get all unique bonafide subsets (excluding "Mean")
+    all_subsets = set()
+    for model_data in all_model_results.values():
+        all_subsets.update([s for s in model_data['bonafide_subsets'] if s != "Mean"])
+    all_subsets = sorted(all_subsets)
+    
+    # Prepare data for print_table
+    max_data_array = []
+    avg_data_array = []
+    row_tags = []
+    
+    # Add data for each model
+    for model_name in model_dirs:
+        if model_name in all_model_results:
+            model_data = all_model_results[model_name]
+            max_row_data = []
+            avg_row_data = []
+            
+            # Add EERs for each bonafide subset
+            for subset in all_subsets:
+                if subset in model_data['bonafide_subsets']:
+                    idx = model_data['bonafide_subsets'].index(subset)
+                    max_row_data.append(model_data['max_eers'][idx])
+                    avg_row_data.append(model_data['avg_eers'][idx])
+                else:
+                    max_row_data.append(np.nan)
+                    avg_row_data.append(np.nan)
+            
+            # Add mean EER
+            mean_idx = model_data['bonafide_subsets'].index("Mean")
+            max_row_data.append(model_data['max_eers'][mean_idx])
+            avg_row_data.append(model_data['avg_eers'][mean_idx])
+            
+            max_data_array.append(max_row_data)
+            avg_data_array.append(avg_row_data)
+            # Truncate model name to 10 characters
+            row_tags.append(model_name.replace('_','-')[:10])
+    
+    # Convert to numpy arrays
+    max_data_array = np.array(max_data_array)
+    avg_data_array = np.array(avg_data_array)
+    
+    # Column tags (all subsets + "Mean"), truncated to 10 characters
+    column_tags = [subset.replace('_','-')[:10] for subset in all_subsets] + ["avg"]
+    
+    # Print LaTeX table using print_table
+    print("\nLaTeX Table:")
+    print_table(
+        data_array=max_data_array,
+        column_tag=column_tags,
+        row_tag=row_tags,
+        n_synthesizers=n_synthesizers,
+        data_array2=avg_data_array,
+        print_format="1.2f",
+        with_color_cell=True,
+        colormap='Blues',
+        colorscale=0.5,
+        colorwrap=0,
+        col_sep='',
+        print_latex_table=True,
+        print_text_table=False,
+        print_format_along_row=False,
+        color_minmax_in='global',
+        pad_data_column=0,
+        pad_dummy_col=0
+    )
+
 def main():
     parser = argparse.ArgumentParser(description='Compute cross-testing EERs for audio deepfake detection')
     parser.add_argument('--config', type=str, default='config.yaml',
@@ -460,6 +602,9 @@ def main():
         
         # Create merged plot with all models
         create_merged_matrix_plot(args.plot_dir, args.output_dir)
+        
+        # Compute and display model statistics
+        compute_model_statistics(args.output_dir)
         
         print(f"\nVisualization updated successfully:")
         print(f"   Using existing results from: {model_output_dir}")
@@ -566,6 +711,9 @@ def main():
     
     # Create merged plot with all models
     create_merged_matrix_plot(args.plot_dir, args.output_dir)
+    
+    # Compute and display model statistics
+    compute_model_statistics(args.output_dir)
     
     # Save detailed EER results
     eer_details_path = os.path.join(model_output_dir, 'eer_details.json')
