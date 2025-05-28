@@ -484,7 +484,7 @@ datasets:
 
 | Option | Description | Size | Link |
 |--------|-------------|------|------|
-| 📦 **All-in-One Package** | Pre-processed datasets with 600 samples per type | ~2GB | [Zenodo](https://zenodo.org/) |
+| 📦 **All-in-One Package** | Pre-processed datasets with 600 samples per type | ~2GB | [TBA](https://zenodo.org/) |
 | 📚 **Detailed Guide** | Step-by-step instructions for each dataset | Varies | [Dataset Guide](datasets/README.md) |
 
 > 💡 **Pro Tip:** The all-in-one package is recommended for quick evaluation. For full datasets or specific subsets, follow the manual download guide in [datasets/README.md](datasets/README.md).

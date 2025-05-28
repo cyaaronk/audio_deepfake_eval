@@ -15,7 +15,7 @@ For convenience, we provide a pre-processed version of the datasets to evaluate 
 
 ### 📦 Quick Start
 
-1. **Download** the pre-processed datasets zip file from [Zenodo](https://zenodo.org/)
+1. **Download** the pre-processed datasets zip file from [TBA](https://zenodo.org/)
 2. **Extract** the zip file to your workspace
 3. **Verify** the dataset structure:
 
