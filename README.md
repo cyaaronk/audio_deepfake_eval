@@ -13,6 +13,22 @@
 
 A comprehensive evaluation framework for audio deepfake detection (ADD) from [NTU DTC](https://www.ntu.edu.sg/dtc), providing standardized tools for computing Equal Error Rates (EERs) and analyzing model performance across diverse datasets.
 
+<p align="center">
+  • • •
+</p>
+
+## 🎉 News
+
+- 🔥 **[2025.07.09]** Our work "Bona fide Cross Testing Reveals Weak Spot in Audio Deepfake Detection Systems" is accepted by Interspeech25! We have prepared the code/dataset below to reproduce the results in the paper.
+- 🔥 **[2025.05.26]** Official release with benchmark results for 164 synthesizers and 9 bona fide speech styles
+- 🔥 **[2024.09.18]** Documentation released with technical research and discussions.
+
+> ⭐ If you like this project, please star it! Your support motivates us to keep improving.
+
+<p align="center">
+  • • •
+</p>
+
 ## 📋 Contents
 - [Introduction](#-introduction)
 - [Key Features](#-key-features)
@@ -322,6 +338,71 @@ The merged matrix is saved as `merged_cross_testing_matrix.png` in the visualiza
   • • •
 </p>
 
+## 📊 Supported Datasets
+
+We have prepared the following datasets for you to reproduce our results in the benchmark paper.
+
+### 🎵 Audio Codecs
+✅ CodecFake  
+✅ academicodec_hifi_16k_320d  
+✅ audiodec_24k_320d  
+✅ descript-audio-codec-16khz  
+✅ encodec_24khz  
+✅ funcodec-funcodec_en_libritts-16k-nq32ds320  
+
+### 🗣️ Speech Datasets  
+✅ librispeech_test_clean  
+✅ librispeech_test_other  
+✅ ami_ihm  
+✅ ami_sdm  
+✅ vctk  
+
+### 🎭 Deepfake Detection Datasets
+✅ asvspoof2021_df  
+✅ asvspoof2019_la  
+✅ av_deepfake_1m  
+✅ emofake  
+✅ fakeavceleb  
+✅ llamapartialspoof_r01tts0a  
+✅ llamapartialspoof_r01tts0b  
+✅ mlaad  
+✅ partialspoof  
+✅ release_in_the_wild  
+✅ scenefake  
+✅ speech_tokenizer 
+
+<p align="center">
+  • • •
+</p>
+
+## 📥 Dataset Access
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="50%">
+        <b>🚀 Quick Download</b><br>
+        <em>Pre-processed datasets in a single package</em>
+      </td>
+      <td align="center" width="50%">
+        <b>🔍 Manual Download</b><br>
+        <em>Individual dataset access with detailed instructions</em>
+      </td>
+    </tr>
+  </table>
+</div>
+
+| Option | Description | Size | Link |
+|--------|-------------|------|------|
+| 📦 **All-in-One Package** | Pre-processed datasets with 600 samples per type | ~6GB | [Zenodo](https://zenodo.org/records/15514835) |
+| 📚 **Detailed Guide** | Step-by-step instructions for each dataset | Varies | [Dataset Guide](datasets/README.md) |
+
+> 💡 **Pro Tip:** The all-in-one package is recommended for quick evaluation. For full datasets or specific subsets, follow the manual download guide in [datasets/README.md](datasets/README.md).
+
+<p align="center">
+  • • •
+</p>
+
 ## 🔧 Use your own model and dataset for evaluation
 
 After you run your own model on custom datasets and obtain the classification scores, you can evaluate them by:
@@ -430,69 +511,6 @@ datasets:
   • • •
 </p>
 
-## 📊 Supported Datasets
-
-### 🎵 Audio Codecs
-✅ CodecFake  
-✅ academicodec_hifi_16k_320d  
-✅ audiodec_24k_320d  
-✅ descript-audio-codec-16khz  
-✅ encodec_24khz  
-✅ funcodec-funcodec_en_libritts-16k-nq32ds320  
-
-### 🗣️ Speech Datasets  
-✅ librispeech_test_clean  
-✅ librispeech_test_other  
-✅ ami_ihm  
-✅ ami_sdm  
-✅ vctk  
-
-### 🎭 Deepfake Detection Datasets
-✅ asvspoof2021_df  
-✅ asvspoof2019_la  
-✅ av_deepfake_1m  
-✅ emofake  
-✅ fakeavceleb  
-✅ llamapartialspoof_r01tts0a  
-✅ llamapartialspoof_r01tts0b  
-✅ mlaad  
-✅ partialspoof  
-✅ release_in_the_wild  
-✅ scenefake  
-✅ speech_tokenizer 
-
-<p align="center">
-  • • •
-</p>
-
-## 📥 Dataset Access
-
-<div align="center">
-  <table>
-    <tr>
-      <td align="center" width="50%">
-        <b>🚀 Quick Download</b><br>
-        <em>Pre-processed datasets in a single package</em>
-      </td>
-      <td align="center" width="50%">
-        <b>🔍 Manual Download</b><br>
-        <em>Individual dataset access with detailed instructions</em>
-      </td>
-    </tr>
-  </table>
-</div>
-
-| Option | Description | Size | Link |
-|--------|-------------|------|------|
-| 📦 **All-in-One Package** | Pre-processed datasets with 600 samples per type | ~2GB | [TBA](https://zenodo.org/) |
-| 📚 **Detailed Guide** | Step-by-step instructions for each dataset | Varies | [Dataset Guide](datasets/README.md) |
-
-> 💡 **Pro Tip:** The all-in-one package is recommended for quick evaluation. For full datasets or specific subsets, follow the manual download guide in [datasets/README.md](datasets/README.md).
-
-<p align="center">
-  • • •
-</p>
-
 ## 📈 Leaderboard
 
 <p align="center">
@@ -521,14 +539,3 @@ The leaderboard shows Equal Error Rate (EER) performance of different models acr
 ⬜ Support for new audio codecs  
 ⬜ Integration with more deepfake detection models  
 ⬜ Real-time evaluation pipeline  
-
-<p align="center">
-  • • •
-</p>
-
-## 🎉 News
-
-- 🔥 **[2025.05.26]** Official release with benchmark results for 164 synthesizers and 9 bona fide speech styles
-- 🔥 **[2024.09.18]** Documentation released with technical research and discussions.
-
-> ⭐ If you like this project, please star it! Your support motivates us to keep improving.

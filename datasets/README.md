@@ -11,11 +11,11 @@ After downloading the datasets, you may:
 
 For convenience, we provide a pre-processed version of the datasets to evaluate and package them into a single ZIP file for download. 
 
-> 💡 **Note:** To reduce the dataset size (From 2TB to 2GB), we randomly sampled 600 audios from each bona fide speech type and synthesizer type.
+> 💡 **Note:** To reduce the dataset size (From 2TB to 6GB), we randomly sampled 600 audios from each bona fide speech type and synthesizer type.
 
 ### 📦 Quick Start
 
-1. **Download** the pre-processed datasets zip file from [TBA](https://zenodo.org/)
+1. **Download** the pre-processed datasets zip file from [Zenodo](https://zenodo.org/records/15514835)
 2. **Extract** the zip file to your workspace
 3. **Verify** the dataset structure:
 
