@@ -19,7 +19,7 @@ A comprehensive evaluation framework for audio deepfake detection (ADD) from [NT
 
 ## 🎉 News
 
-- 🔥 **[2025.07.09]** Our work "Bona fide Cross Testing Reveals Weak Spot in Audio Deepfake Detection Systems" is accepted by Interspeech25! We have prepared the code/dataset below to reproduce the results in the paper.
+- 🔥 **[2025.07.09]** Our work ["Bona fide Cross Testing Reveals Weak Spot in Audio Deepfake Detection Systems"](https://www.isca-archive.org/interspeech_2025/kwok25_interspeech.pdf) is accepted by Interspeech25! We have prepared the code/dataset below to reproduce the results in the paper.
 - 🔥 **[2025.05.26]** Official release with benchmark results for 164 synthesizers and 9 bona fide speech styles
 - 🔥 **[2024.09.18]** Documentation released with technical research and discussions.
 
